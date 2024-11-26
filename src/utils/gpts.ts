@@ -37,3 +37,5 @@ export async function gpt(
     }
   }
 }
+
+// Todo: Generate questions from Youtube transcript function
