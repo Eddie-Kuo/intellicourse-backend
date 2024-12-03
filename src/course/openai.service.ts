@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
-
-// type GeneratedOutput = Record<string, string> | string;
 
 @Injectable()
 export class OpenAiService {
