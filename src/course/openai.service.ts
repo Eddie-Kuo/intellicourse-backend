@@ -12,8 +12,8 @@ export class OpenAiService {
   }
 
   async generateCourse(
-    system_prompt: string,
-    user_prompt: string,
+    systemPrompt: string,
+    userPrompt: string,
     outputFormat: Record<string, string>,
   ) {
     try {
@@ -23,9 +23,9 @@ export class OpenAiService {
         messages: [
           {
             role: 'system',
-            content: `${system_prompt} Make sure to structure the output using the following JSON format: ${JSON.stringify(outputFormat)}.`,
+            content: `${systemPrompt} Make sure to structure the output using the following JSON format: ${JSON.stringify(outputFormat)}.`,
           },
-          { role: 'user', content: user_prompt },
+          { role: 'user', content: userPrompt },
         ],
         response_format: {
           type: 'json_object',
