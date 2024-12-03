@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CourseService } from './course.service';
+import { CourseOutput, CourseService } from './course.service';
+import { CreateCourseDto } from './dto/create-course.dto';
 
 @Controller('course')
 export class CourseController {
@@ -16,8 +17,9 @@ export class CourseController {
   }
 
   @Post()
-  createCourse(@Body() topic: string) {
-    // Create a course based on the inputted topic
-    return this.courseService.createCourse(topic);
+  createCourse(
+    @Body() createCourseDto: CreateCourseDto,
+  ): Promise<CourseOutput> {
+    return this.courseService.createCourse(createCourseDto);
   }
 }
