@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-interface Course {
+interface CourseOutput {
   title: string;
   units: {
     title: string;
@@ -13,5 +13,8 @@ interface Course {
 
 @Injectable()
 export class CourseService {
-  async createCourse(topic: string) {}
+  async createCourse(topic: string) {
+    try {
+    } catch (error) {}
+  }
 }
