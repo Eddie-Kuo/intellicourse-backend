@@ -14,7 +14,7 @@ export class OpenAiService {
   async generateCourse(
     system_prompt: string,
     user_prompt: string,
-    outputFormat: any,
+    outputFormat: Record<string, string>,
   ) {
     try {
       const response = await this.openai.chat.completions.create({
