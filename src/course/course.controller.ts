@@ -1,9 +1,25 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { CourseOutput, CourseService } from './course.service';
+import { CreateCourseDto } from './dto/create-course.dto';
 
 @Controller('course')
 export class CourseController {
-  @Get('/')
+  constructor(private courseService: CourseService) {}
+
+  @Get()
   sayHello() {
     return 'hello world';
+  }
+
+  @Get('/dashboard')
+  getCourseList() {
+    // Fetch all the courses created by the user
+  }
+
+  @Post()
+  createCourse(
+    @Body() createCourseDto: CreateCourseDto,
+  ): Promise<CourseOutput> {
+    return this.courseService.createCourse(createCourseDto);
   }
 }
