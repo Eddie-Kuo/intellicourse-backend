@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import Innertube, { ClientType } from 'youtubei.js';
+import Innertube from 'youtubei.js';
 
 @Injectable()
 export class YoutubeService {
