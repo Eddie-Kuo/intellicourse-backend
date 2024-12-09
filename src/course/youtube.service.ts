@@ -4,6 +4,20 @@ import Innertube from 'youtubei.js';
 
 @Injectable()
 export class YoutubeService {
+  private youtube: Innertube;
+
+  constructor() {
+    this.initYoutube().then((youtube) => {
+      this.youtube = youtube;
+    });
+  }
+
+  private async initYoutube() {
+    return await Innertube.create({
+      retrieve_player: false,
+    });
+  }
+
   async getYoutubeVideoId(searchQuery: string): Promise<string> {
     // hello world => hello+world
     searchQuery = encodeURIComponent(searchQuery);
@@ -21,13 +35,8 @@ export class YoutubeService {
   }
 
   async getYoutubeVideoTranscript(videoId: string): Promise<string> {
-    //! Getting [YOUTUBEJS][Parser]: ParsingError: Type mismatch
-    const youtube = await Innertube.create({
-      retrieve_player: false,
-    });
-
     try {
-      const videoInfo = await youtube.getInfo(videoId); // get video info by video Id
+      const videoInfo = await this.youtube.getInfo(videoId); // get video info by video Id
       const transcriptData = await videoInfo.getTranscript();
 
       if (!transcriptData?.transcript?.content?.body?.initial_segments) {
