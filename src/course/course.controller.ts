@@ -1,10 +1,14 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CourseOutput, CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
+import { YoutubeService } from './youtube.service';
 
 @Controller('course')
 export class CourseController {
-  constructor(private courseService: CourseService) {}
+  constructor(
+    private courseService: CourseService,
+    private youtubeService: YoutubeService,
+  ) {}
 
   @Get()
   sayHello() {
@@ -21,5 +25,10 @@ export class CourseController {
     @Body() createCourseDto: CreateCourseDto,
   ): Promise<CourseOutput> {
     return this.courseService.createCourse(createCourseDto);
+  }
+
+  @Post('/youtube')
+  getYoutubeVideoId(@Body() query: string) {
+    return this.youtubeService.getYoutubeVideoTranscript('tLeNSnKjZlU');
   }
 }
