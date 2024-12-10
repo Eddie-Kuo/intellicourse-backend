@@ -26,12 +26,13 @@ export class YoutubeService {
       `https://www.googleapis.com/youtube/v3/search?key=${process.env.YOUTUBE_API}&q=${searchQuery}&videoDuration=medium&videoEmbeddable=true&type=video&maxResults=5`,
     );
 
-    if (!data) {
-      console.log('Youtube Search Failed!');
+    if (!data.items.length) {
+      console.log('No Youtube Videos returned from that search query');
       return;
     }
 
-    return data;
+    // return the first video
+    return data.items[0].id.videoId;
   }
 
   async getYoutubeVideoTranscript(videoId: string): Promise<string> {

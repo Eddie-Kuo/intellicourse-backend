@@ -32,4 +32,9 @@ export class CourseController {
   getYoutubeVideoTranscript(@Body() query: string) {
     return this.youtubeService.getYoutubeVideoTranscript('WB6eJmaqxGw');
   }
+
+  @Post('/youtube/video')
+  getYoutubeVideoId(@Body() query: string) {
+    return this.youtubeService.getYoutubeVideoId('how to train a new puppy');
+  }
 }
