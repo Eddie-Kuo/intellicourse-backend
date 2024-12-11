@@ -56,4 +56,30 @@ export class YoutubeService {
       return '';
     }
   }
+
+  //* batch processing
+  async findAndProcessVideo(searchQuery: string): Promise<{
+    videoId: string;
+    transcript: string;
+  }> {
+    try {
+      const videoId = await this.getYoutubeVideoId(searchQuery);
+      if (!videoId) {
+        throw new Error('No video found for query: ' + searchQuery);
+      }
+
+      const transcript = await this.getYoutubeVideoTranscript(videoId);
+      if (!transcript) {
+        throw new Error('No transcript found for video: ' + videoId);
+      }
+
+      return {
+        videoId,
+        transcript,
+      };
+    } catch (error) {
+      console.error(`Error processing video for query: ${searchQuery}`, error);
+      throw error;
+    }
+  }
 }

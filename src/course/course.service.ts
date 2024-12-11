@@ -19,7 +19,7 @@ export class CourseService {
 
   async createCourse(createCourseDto: CreateCourseDto): Promise<CourseOutput> {
     const { topic } = createCourseDto;
-    console.log('topic', topic);
+
     const generatedCourse = await this.openAiService.generateCourse(
       `You are an experienced instructor on the topic of ${topic}, coming up with relevant unit titles, detailed chapters, and finding relevant youtube videos for each of the chapters.`,
       `It is your job to create a detailed course roadmap about ${topic}. Create units for all the major topics about ${topic}. Then, for each unit, create a list of chapters breaking down the unit into more specific subtopics for the user to follow. Then for each chapter, provide a detailed youtube search query that can be used to find an informative educational video for each chapter. Each query should give an educational informative course in youtube.`,
@@ -32,6 +32,19 @@ export class CourseService {
     );
 
     console.log('GeneratedCourse in Service', generatedCourse);
+
+    const processedUnits = await Promise.all(
+      generatedCourse.units.map(async (unit) => {
+        const processedChapters = await Promise.all(
+          unit.chapters.map(async (chapter) => {
+            // find and process video transcript
+            // summarize transcript
+            // generate questions
+          }),
+        );
+      }),
+    );
+
     return;
   }
 }
