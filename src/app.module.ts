@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CourseModule } from './course/course.module';
 import { CourseService } from './course/course.service';
 import { OpenAiService } from './course/openai.service';
+import { YoutubeService } from './course/youtube.service';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { OpenAiService } from './course/openai.service';
     CourseModule,
   ],
   controllers: [],
-  providers: [CourseService, OpenAiService],
+  providers: [CourseService, OpenAiService, YoutubeService],
 })
 export class AppModule {}

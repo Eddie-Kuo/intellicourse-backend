@@ -28,7 +28,7 @@ export class YoutubeService {
 
     if (!data.items.length) {
       console.log('No Youtube Videos returned from that search query');
-      return;
+      return '';
     }
 
     // return the first video
