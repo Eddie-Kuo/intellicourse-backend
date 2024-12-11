@@ -22,6 +22,7 @@ export interface Question {
 
 @Injectable()
 export class CourseService {
+  private courseTopic: string = '';
   constructor(
     private openAiService: OpenAiService,
     private youtubeService: YoutubeService,
@@ -29,60 +30,73 @@ export class CourseService {
 
   async createCourse(createCourseDto: CreateCourseDto): Promise<any> {
     const { topic } = createCourseDto;
+    this.courseTopic = topic;
 
-    const generatedCourse: CourseOutput =
-      await this.openAiService.generateCourse(topic, {
-        title: 'Title of the course',
-        units: 'Title of the units',
-        chapters:
-          'An array of chapters covering the important topics in the unit. Each chapter with a relevant youtube_search_query and a chapter_title key in the JSON object. Be very specific on the material covered in each chapter.',
-      });
+    try {
+      const generatedCourse: CourseOutput =
+        await this.openAiService.generateCourse(topic, {
+          title: 'Title of the course',
+          units: 'Title of the units',
+          chapters:
+            'An array of chapters covering the important topics in the unit. Each chapter with a relevant youtube_search_query and a chapter_title key in the JSON object. Be very specific on the material covered in each chapter.',
+        });
 
-    await Promise.all(
-      generatedCourse.units.map(async (unit) => {
-        await Promise.all(
-          unit.chapters.map(async (chapter) => {
-            const videoId = await this.youtubeService.getYoutubeVideoId(
-              chapter.youtube_search_query,
-            );
+      await this.processUnits(generatedCourse.units);
 
-            if (!videoId) {
-              return;
-            }
+      // return the course Id to re route the user to the course once it finishes generating
+      return { message: 'Course generation completed' };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
 
-            const transcript =
-              await this.youtubeService.getYoutubeVideoTranscript(videoId);
+  async processUnits(units: CourseOutput['units']) {
+    const unitPromises = units.map((unit) => this.processUnit(unit));
+    await Promise.all(unitPromises);
+  }
 
-            if (!transcript.length) {
-              return;
-            }
-
-            const summary =
-              await this.openAiService.summarizeVideoTranscript(transcript);
-
-            const questions: Question =
-              await this.openAiService.generateQuestionsFromSummary({
-                courseTitle: generatedCourse.title,
-                summary,
-                outputFormat: {
-                  question: 'The question',
-                  options:
-                    'an array of four answer choices to the question with one of them being the correct answer',
-                  answer: 'the answer to the question',
-                },
-              });
-            console.log(
-              '🚀 ~ CourseService ~ unit.chapters.map ~ questions:',
-              questions,
-            );
-
-            //Todo next: input all the generated data into a database
-          }),
-        );
-      }),
+  async processUnit(unit: CourseOutput['units'][0]) {
+    const chapterPromises = unit.chapters.map((chapter) =>
+      this.processChapter(chapter),
     );
+    await Promise.all(chapterPromises);
+  }
 
-    // return the course Id to re route the user to the course once it finishes generating
-    return { courseId: 1 };
+  async processChapter(chapter: CourseOutput['units'][0]['chapters'][0]) {
+    try {
+      const videoId = await this.youtubeService.getYoutubeVideoId(
+        chapter.youtube_search_query,
+      );
+
+      if (!videoId) {
+        return;
+      }
+
+      const transcript =
+        await this.youtubeService.getYoutubeVideoTranscript(videoId);
+
+      if (!transcript.length) {
+        return;
+      }
+
+      const summary =
+        await this.openAiService.summarizeVideoTranscript(transcript);
+
+      const questions: Question =
+        await this.openAiService.generateQuestionsFromSummary({
+          courseTitle: this.courseTopic,
+          summary,
+          outputFormat: {
+            question: 'The question',
+            options:
+              'an array of four answer choices to the question with one of them being the correct answer',
+            answer: 'the answer to the question',
+          },
+        });
+    } catch (error) {
+      console.error('Error processing chapter', error);
+    }
   }
 }
