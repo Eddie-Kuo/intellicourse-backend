@@ -14,6 +14,12 @@ export interface CourseOutput {
   }[];
 }
 
+export interface Question {
+  question: string;
+  answer: string;
+  options: string[];
+}
+
 @Injectable()
 export class CourseService {
   constructor(
@@ -51,20 +57,36 @@ export class CourseService {
             const transcript =
               await this.youtubeService.getYoutubeVideoTranscript(videoId);
 
-            // only summarize if there is a transcript.
-            // generate questions based on the summary
             if (!transcript.length) {
               return;
             }
 
-            // generate questions from the summary - at this point if there is a summary there will be questions
             const summary =
               await this.openAiService.summarizeTranscript(transcript);
+
+            const questions: Question =
+              await this.openAiService.generateQuestionsFromSummary({
+                courseTitle: generatedCourse.title,
+                summary,
+                outputFormat: {
+                  question: 'The question',
+                  options:
+                    'an array of four answer choices to the question with one of them being the correct answer',
+                  answer: 'the answer to the question',
+                },
+              });
+            console.log(
+              '🚀 ~ CourseService ~ unit.chapters.map ~ questions:',
+              questions,
+            );
+
+            //Todo next: input all the generated data into a database
           }),
         );
       }),
     );
 
-    return;
+    // return the course Id to re route the user to the course once it finishes generating
+    return { courseId: 1 };
   }
 }

@@ -79,4 +79,49 @@ export class OpenAiService {
       }
     }
   }
+
+  async generateQuestionsFromSummary({
+    summary,
+    courseTitle,
+    outputFormat,
+  }: {
+    summary: string;
+    courseTitle: string;
+    outputFormat: Record<string, string>;
+  }) {
+    const emptyQuestion = {
+      question: 'No question for this chapter',
+      options: [],
+    };
+
+    try {
+      const response = await this.openai.chat.completions.create({
+        model: this.model,
+        temperature: this.temperature,
+        messages: [
+          {
+            role: 'system',
+            content: `You are a helpful AI that is able to generate mcq questions and answers based on a given topic. Make sure to structure the output using the following JSON format: ${JSON.stringify(outputFormat)}.`,
+          },
+          {
+            role: 'user',
+            content: `You are to generate a random hard mcq question about ${courseTitle} with context of the following transcript: ${summary}. The length of each answer should not be more than 15 words and do not include letter choice options within the options.`,
+          },
+        ],
+      });
+
+      const generatedQuestion = response.choices[0].message?.content;
+
+      if (generatedQuestion) {
+        const res = JSON.parse(generatedQuestion);
+        return res;
+      }
+
+      return emptyQuestion;
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Error summarizing transcript', error.message);
+      }
+    }
+  }
 }
