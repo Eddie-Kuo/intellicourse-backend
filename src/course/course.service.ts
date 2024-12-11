@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { OpenAiService } from './openai.service';
-import { CreateCourseDto } from './dto/create-course.dto';
+import { GenerateCourseDto } from './dto/generate-course.dto';
 import { YoutubeService } from './youtube.service';
 
 export interface CourseOutput {
@@ -28,8 +28,8 @@ export class CourseService {
     private youtubeService: YoutubeService,
   ) {}
 
-  async createCourse(createCourseDto: CreateCourseDto): Promise<any> {
-    const { topic } = createCourseDto;
+  async generateCourse(generateCourseDto: GenerateCourseDto): Promise<any> {
+    const { topic } = generateCourseDto;
     this.courseTopic = topic;
 
     try {
