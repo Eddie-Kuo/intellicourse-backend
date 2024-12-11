@@ -4,8 +4,8 @@ import OpenAI from 'openai';
 @Injectable()
 export class OpenAiService {
   private openai: OpenAI;
-  private temperature: number = 0.8;
-  private model: string = 'gpt-4o';
+  private temperature: number = 1;
+  private model: string = 'gpt-3.5-turbo';
 
   constructor() {
     this.openai = new OpenAI({
@@ -51,6 +51,10 @@ export class OpenAiService {
   }
 
   async summarizeTranscript(transcript: string): Promise<string> {
+    if (!transcript.length) {
+      return 'No summary available for this chapter!';
+    }
+
     try {
       const response = await this.openai.chat.completions.create({
         model: this.model,
@@ -59,18 +63,14 @@ export class OpenAiService {
           {
             role: 'system',
             content:
-              'You are a helpful assistant that summarizes educational content.',
+              'You are a helpful assistant that summarizes a youtube transcript.',
           },
           {
             role: 'user',
-            content: `Please summarize the following transcript in a concise way (250 words or less): '${transcript}'. Do not talk about the sponsors or anything unrelated to the main topic of the video or introduce what the summary is about. `,
+            content: `Please summarize the following video transcript in 250 words or less: '${transcript}'. Do not talk about the sponsors or anything unrelated to the main topic of the video or introduce what the summary is about. `,
           },
         ],
       });
-
-      if (!response.choices[0].message.content) {
-        return 'No summary available for this chapter!';
-      }
 
       return response.choices[0].message.content;
     } catch (error) {
