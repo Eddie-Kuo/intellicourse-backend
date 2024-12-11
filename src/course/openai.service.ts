@@ -1,5 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import OpenAI from 'openai';
+import { CourseOutput } from './course.service';
+
+interface GenerateQuestionParams {
+  summary: string;
+  courseTitle: string;
+  outputFormat: Record<string, string>;
+}
+
+interface Question {
+  question: string;
+  options: string[];
+  answer: string;
+}
 
 @Injectable()
 export class OpenAiService {
@@ -14,10 +27,9 @@ export class OpenAiService {
   }
 
   async generateCourse(
-    systemPrompt: string,
-    userPrompt: string,
+    topic: string,
     outputFormat: Record<string, string>,
-  ) {
+  ): Promise<CourseOutput | null> {
     try {
       const response = await this.openai.chat.completions.create({
         model: this.model,
@@ -25,9 +37,12 @@ export class OpenAiService {
         messages: [
           {
             role: 'system',
-            content: `${systemPrompt} Make sure to structure the output using the following JSON format: ${JSON.stringify(outputFormat)}.`,
+            content: `You are an experienced instructor on the topic of ${topic}, coming up with relevant unit titles, detailed chapters, and finding relevant youtube videos for each of the chapters. Make sure to structure the output using the following JSON format: ${JSON.stringify(outputFormat)}.`,
           },
-          { role: 'user', content: userPrompt },
+          {
+            role: 'user',
+            content: `It is your job to create a detailed course roadmap about ${topic}. Create units for all the major topics about ${topic}. Then, for each unit, create a list of chapters breaking down the unit into more specific subtopics for the user to follow. Then for each chapter, provide a detailed youtube search query that can be used to find an informative educational video for each chapter. Each query should give an educational informative course in youtube.`,
+          },
         ],
         response_format: {
           type: 'json_object',
@@ -36,21 +51,14 @@ export class OpenAiService {
 
       // todo: fix the return value/type of this function to be more consistent
       const generatedContent = response.choices[0].message?.content ?? '';
-
-      if (generatedContent) {
-        const res = JSON.parse(generatedContent);
-        return res;
-      }
-
-      return generatedContent;
+      return generatedContent ? JSON.parse(generatedContent) : null;
     } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(error.message);
-      }
+      console.error('Error generating course:', error);
+      throw error;
     }
   }
 
-  async summarizeTranscript(transcript: string): Promise<string> {
+  async summarizeVideoTranscript(transcript: string): Promise<string> {
     if (!transcript.length) {
       return 'No summary available for this chapter!';
     }
@@ -72,11 +80,10 @@ export class OpenAiService {
         ],
       });
 
-      return response.choices[0].message.content;
+      return response.choices[0].message.content ?? 'No summary generated';
     } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error summarizing transcript', error.message);
-      }
+      console.error('Error summarizing transcript:', error);
+      return 'Error generating summary';
     }
   }
 
@@ -84,14 +91,11 @@ export class OpenAiService {
     summary,
     courseTitle,
     outputFormat,
-  }: {
-    summary: string;
-    courseTitle: string;
-    outputFormat: Record<string, string>;
-  }) {
-    const emptyQuestion = {
+  }: GenerateQuestionParams): Promise<Question> {
+    const emptyQuestion: Question = {
       question: 'No question for this chapter',
       options: [],
+      answer: '',
     };
 
     try {
@@ -112,16 +116,10 @@ export class OpenAiService {
 
       const generatedQuestion = response.choices[0].message?.content;
 
-      if (generatedQuestion) {
-        const res = JSON.parse(generatedQuestion);
-        return res;
-      }
-
-      return emptyQuestion;
+      return generatedQuestion ? JSON.parse(generatedQuestion) : emptyQuestion;
     } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error summarizing transcript', error.message);
-      }
+      console.error('Error generating questions:', error);
+      return emptyQuestion;
     }
   }
 }

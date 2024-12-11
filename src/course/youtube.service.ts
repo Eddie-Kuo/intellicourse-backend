@@ -26,7 +26,7 @@ export class YoutubeService {
       `https://www.googleapis.com/youtube/v3/search?key=${process.env.YOUTUBE_API}&q=${searchQuery}&videoDuration=medium&videoEmbeddable=true&type=video&maxResults=5`,
     );
 
-    if (!data.items.length) {
+    if (!data.items?.length) {
       console.log('No Youtube Videos returned from that search query');
       return '';
     }
@@ -52,7 +52,7 @@ export class YoutubeService {
 
       return formattedTranscript;
     } catch (error) {
-      console.log('Error: Error when transcribing Youtube Video', error);
+      console.error('Error: Error when transcribing Youtube Video', error);
       return '';
     }
   }
