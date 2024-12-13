@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CourseOutput, CourseService } from './course.service';
-import { CreateCourseDto } from './dto/create-course.dto';
+import { GenerateCourseDto } from './dto/generate-course.dto';
 import { YoutubeService } from './youtube.service';
 
 @Controller('course')
@@ -22,9 +22,9 @@ export class CourseController {
 
   @Post()
   createCourse(
-    @Body() createCourseDto: CreateCourseDto,
+    @Body() generateCourseDto: GenerateCourseDto,
   ): Promise<CourseOutput> {
-    return this.courseService.createCourse(createCourseDto);
+    return this.courseService.generateCourse(generateCourseDto);
   }
 
   // for testing youtube provider
