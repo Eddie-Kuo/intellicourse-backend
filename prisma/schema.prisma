@@ -9,23 +9,52 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
-  authorId  Int?
+model Course {
+  id    String @id @default(cuid())
+  title String
+  units Unit[]
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+model Unit {
+  id       String    @id @default(cuid())
+  title    String
+  courseId String
+  chapters Chapter[]
+  course   Course    @relation(fields: [courseId], references: [id])
+
+  @@index([courseId], name: "courseId")
+}
+
+model Chapter {
+  id     String @id @default(cuid())
+  unitId String
+
+  title              String
+  videoId            String
+  youtubeSearchQuery String
+  summary            String
+
+  questions Question[]
+
+  unit Unit @relation(fields: [unitId], references: [id])
+
+  @@index([unitId], name: "unitId")
+}
+
+model Question {
+  id        String @id @default(cuid())
+  chapterId String
+
+  question String
+  answer   String
+  options  String
+
+  chapter Chapter @relation(fields: [chapterId], references: [id])
+
+  @@index([chapterId], name: "chapterId")
 }
