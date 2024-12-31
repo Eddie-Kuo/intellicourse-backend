@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { OpenAiService } from './openai.service';
 import { GenerateCourseDto } from './dto/generate-course.dto';
 import { YoutubeService } from './youtube.service';
+import { PrismaService } from './prisma.service';
 
 export interface CourseOutput {
   title: string;
@@ -26,6 +27,7 @@ export class CourseService {
   constructor(
     private openAiService: OpenAiService,
     private youtubeService: YoutubeService,
+    private prismaService: PrismaService,
   ) {}
 
   async generateCourse(generateCourseDto: GenerateCourseDto): Promise<any> {
@@ -41,7 +43,13 @@ export class CourseService {
             'An array of chapters covering the important topics in the unit. Each chapter with a relevant youtube_search_query and a chapter_title key in the JSON object. Be very specific on the material covered in each chapter.',
         });
 
-      await this.processUnits(generatedCourse.units);
+      const course = await this.prismaService.course.create({
+        data: {
+          title: generatedCourse.title,
+        },
+      });
+
+      await this.processUnits(generatedCourse.units, course.id);
 
       // return the course Id to re route the user to the course once it finishes generating
       return { message: 'Course generation completed' };
@@ -52,19 +60,29 @@ export class CourseService {
     }
   }
 
-  async processUnits(units: CourseOutput['units']) {
-    const unitPromises = units.map((unit) => this.processUnit(unit));
+  async processUnits(units: CourseOutput['units'], courseId: string) {
+    const unitPromises = units.map((unit) => this.processUnit(unit, courseId));
     await Promise.all(unitPromises);
   }
 
-  async processUnit(unit: CourseOutput['units'][0]) {
+  async processUnit(unit: CourseOutput['units'][0], courseId: string) {
+    const addedUnit = await this.prismaService.unit.create({
+      data: {
+        title: unit.title,
+        courseId,
+      },
+    });
+
     const chapterPromises = unit.chapters.map((chapter) =>
-      this.processChapter(chapter),
+      this.processChapter(chapter, addedUnit.id),
     );
     await Promise.all(chapterPromises);
   }
 
-  async processChapter(chapter: CourseOutput['units'][0]['chapters'][0]) {
+  async processChapter(
+    chapter: CourseOutput['units'][0]['chapters'][0],
+    unitId: string,
+  ) {
     try {
       const videoId = await this.youtubeService.getYoutubeVideoId(
         chapter.youtube_search_query,
@@ -95,6 +113,25 @@ export class CourseService {
             answer: 'the answer to the question',
           },
         });
+
+      const addedChapter = await this.prismaService.chapter.create({
+        data: {
+          unitId,
+          title: chapter.chapter_title,
+          videoId,
+          youtubeSearchQuery: chapter.youtube_search_query,
+          summary,
+        },
+      });
+
+      await this.prismaService.question.create({
+        data: {
+          chapterId: addedChapter.id,
+          question: questions.question,
+          answer: questions.answer,
+          options: JSON.stringify(questions.options),
+        },
+      });
     } catch (error) {
       console.error('Error processing chapter', error);
     }
