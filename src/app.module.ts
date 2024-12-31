@@ -4,6 +4,7 @@ import { CourseModule } from './course/course.module';
 import { CourseService } from './course/course.service';
 import { OpenAiService } from './course/openai.service';
 import { YoutubeService } from './course/youtube.service';
+import { PrismaService } from './course/prisma.service';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { YoutubeService } from './course/youtube.service';
     CourseModule,
   ],
   controllers: [],
-  providers: [CourseService, OpenAiService, YoutubeService],
+  providers: [CourseService, OpenAiService, YoutubeService, PrismaService],
 })
 export class AppModule {}

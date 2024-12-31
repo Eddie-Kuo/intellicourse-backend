@@ -5,10 +5,7 @@ import { YoutubeService } from './youtube.service';
 
 @Controller('course')
 export class CourseController {
-  constructor(
-    private courseService: CourseService,
-    private youtubeService: YoutubeService,
-  ) {}
+  constructor(private courseService: CourseService) {}
 
   @Get()
   sayHello() {
@@ -25,17 +22,5 @@ export class CourseController {
     @Body() generateCourseDto: GenerateCourseDto,
   ): Promise<CourseOutput> {
     return this.courseService.generateCourse(generateCourseDto);
-  }
-
-  // for testing youtube provider
-  @Post('/youtube')
-  getYoutubeVideoTranscript(@Body() query: string) {
-    return this.youtubeService.getYoutubeVideoTranscript('WB6eJmaqxGw');
-  }
-
-  // testing
-  @Post('/youtube/video')
-  getYoutubeVideoId(@Body() query: string) {
-    return this.youtubeService.getYoutubeVideoId('how to train a new puppy');
   }
 }
