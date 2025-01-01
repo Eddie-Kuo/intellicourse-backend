@@ -136,4 +136,27 @@ export class CourseService {
       console.error('Error processing chapter', error);
     }
   }
+
+  async getCourseList() {
+    return await this.prismaService.course.findMany();
+  }
+
+  async getCourseDetailsByCourseId(id: string) {
+    return await this.prismaService.course.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        units: {
+          include: {
+            chapters: {
+              include: {
+                questions: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 }
