@@ -151,5 +151,22 @@ export class CourseService {
     });
   }
 
-  async getCourseDetailsByCourseId() {}
+  async getCourseDetailsByCourseId(id: string) {
+    return await this.prismaService.course.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        units: {
+          include: {
+            chapters: {
+              include: {
+                questions: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 }

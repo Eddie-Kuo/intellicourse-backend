@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CourseOutput, CourseService } from './course.service';
 import { GenerateCourseDto } from './dto/generate-course.dto';
 
@@ -24,5 +24,7 @@ export class CourseController {
   }
 
   @Get('/:id')
-  getCourseDetailsByCourseId() {}
+  getCourseDetailsByCourseId(@Param('id') id: string) {
+    return this.courseService.getCourseDetailsByCourseId(id);
+  }
 }
