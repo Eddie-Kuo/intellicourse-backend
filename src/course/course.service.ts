@@ -138,17 +138,7 @@ export class CourseService {
   }
 
   async getCourseList() {
-    return await this.prismaService.course.findMany({
-      include: {
-        units: {
-          include: {
-            chapters: {
-              include: { questions: true },
-            },
-          },
-        },
-      },
-    });
+    return await this.prismaService.course.findMany();
   }
 
   async getCourseDetailsByCourseId(id: string) {
