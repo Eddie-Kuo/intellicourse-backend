@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CourseOutput, CourseService } from './course.service';
 import { GenerateCourseDto } from './dto/generate-course.dto';
 
-@Controller('course')
+@Controller('/api/course')
 export class CourseController {
   constructor(private courseService: CourseService) {}
 
