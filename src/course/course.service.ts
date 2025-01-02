@@ -129,7 +129,9 @@ export class CourseService {
           chapterId: addedChapter.id,
           question: questions.question,
           answer: questions.answer,
-          options: JSON.stringify(questions.options),
+          options: JSON.stringify(
+            questions.options.sort(() => Math.random() - 0.5), // shuffle the options before adding them into database
+          ),
         },
       });
     } catch (error) {
