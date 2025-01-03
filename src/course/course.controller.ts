@@ -2,14 +2,9 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CourseOutput, CourseService } from './course.service';
 import { GenerateCourseDto } from './dto/generate-course.dto';
 
-@Controller('/api/course')
+@Controller('/api/v1/course')
 export class CourseController {
   constructor(private courseService: CourseService) {}
-
-  @Get()
-  sayHello() {
-    return 'hello world';
-  }
 
   @Post()
   createCourse(
@@ -18,7 +13,7 @@ export class CourseController {
     return this.courseService.generateCourse(generateCourseDto);
   }
 
-  @Get('/dashboard')
+  @Get()
   getCourseList() {
     return this.courseService.getCourseList();
   }
