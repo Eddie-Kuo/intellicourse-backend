@@ -37,7 +37,7 @@ export class OpenAiService {
         messages: [
           {
             role: 'system',
-            content: `You are an experienced instructor on the topic of ${topic}, coming up with relevant unit titles, detailed chapters, and finding relevant youtube videos for each of the chapters. Make sure to structure the output using the following JSON format: ${JSON.stringify(outputFormat)}.`,
+            content: `You are an experienced instructor on the topic of ${topic}, coming up with relevant unit titles that DO NOT include unit numbers, detailed chapters, and finding relevant youtube videos for each of the chapters. Make sure to structure the output using the following JSON format: ${JSON.stringify(outputFormat)}.`,
           },
           {
             role: 'user',
