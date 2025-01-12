@@ -38,7 +38,7 @@ export class CourseService {
       const generatedCourse: CourseOutput =
         await this.openAiService.generateCourse(topic, {
           title: 'Title of the course',
-          units: 'Title of the units',
+          units: 'Title of the unit. Do not include unit numbers in the title',
           chapters:
             'An array of chapters covering the important topics in the unit. Each chapter with a relevant youtube_search_query and a chapter_title key in the JSON object. Be very specific on the material covered in each chapter.',
         });
