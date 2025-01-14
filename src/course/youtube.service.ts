@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import Innertube from 'youtubei.js';
 
@@ -6,7 +7,7 @@ import Innertube from 'youtubei.js';
 export class YoutubeService {
   private youtube: Innertube;
 
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     this.initYoutube().then((youtube) => {
       this.youtube = youtube;
     });
@@ -19,11 +20,13 @@ export class YoutubeService {
   }
 
   async getYoutubeVideoId(searchQuery: string): Promise<string> {
+    const youtubeApiKey = this.configService.get<string>('YOUTUBE_API');
+
     // hello world => hello+world
     searchQuery = encodeURIComponent(searchQuery);
 
     const { data } = await axios.get(
-      `https://www.googleapis.com/youtube/v3/search?key=${process.env.YOUTUBE_API}&q=${searchQuery}&videoDuration=medium&videoEmbeddable=true&type=video&maxResults=5`,
+      `https://www.googleapis.com/youtube/v3/search?key=${youtubeApiKey}&q=${searchQuery}&videoDuration=medium&videoEmbeddable=true&type=video&maxResults=5`,
     );
 
     if (!data.items?.length) {
