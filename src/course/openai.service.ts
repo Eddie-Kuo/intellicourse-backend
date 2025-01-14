@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import OpenAI from 'openai';
 import { CourseOutput } from './course.service';
+import { ConfigService } from '@nestjs/config';
 
 interface GenerateQuestionParams {
   summary: string;
@@ -20,9 +21,10 @@ export class OpenAiService {
   private temperature: number = 1;
   private model: string = 'gpt-3.5-turbo';
 
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      // apiKey: process.env.OPENAI_API_KEY,
+      apiKey: this.configService.get<string>('OPENAI_API_KEY'),
     });
   }
 
