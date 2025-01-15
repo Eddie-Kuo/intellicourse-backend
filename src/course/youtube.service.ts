@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import Innertube from 'youtubei.js';
@@ -6,6 +6,7 @@ import Innertube from 'youtubei.js';
 @Injectable()
 export class YoutubeService {
   private youtube: Innertube;
+  private readonly logger = new Logger(YoutubeService.name);
 
   constructor(private readonly configService: ConfigService) {
     this.initYoutube().then((youtube) => {
@@ -55,8 +56,10 @@ export class YoutubeService {
 
       return formattedTranscript;
     } catch (error) {
-      console.error('Error: Error when transcribing Youtube Video', error);
-      return '';
+      this.logger.log(
+        { error: error.message },
+        'Problem encountered while fetching video transcript.',
+      );
     }
   }
 }
