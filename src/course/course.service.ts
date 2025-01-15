@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { OpenAiService } from './openai.service';
 import { GenerateCourseDto } from './dto/generate-course.dto';
 import { YoutubeService } from './youtube.service';
@@ -24,6 +24,7 @@ export interface Question {
 @Injectable()
 export class CourseService {
   private courseTopic: string = '';
+  private readonly logger = new Logger(CourseService.name);
   constructor(
     private openAiService: OpenAiService,
     private youtubeService: YoutubeService,
@@ -54,9 +55,7 @@ export class CourseService {
       // return the course Id to re route the user to the course once it finishes generating
       return { message: 'Course generation completed' };
     } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(error.message);
-      }
+      this.logger.log({ error: error.message }, 'Error generating course.');
     }
   }
 
@@ -135,7 +134,7 @@ export class CourseService {
         },
       });
     } catch (error) {
-      console.error('Error processing chapter', error);
+      this.logger.log({ error }, 'Error processing chapter');
     }
   }
 
