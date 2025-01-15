@@ -6,7 +6,6 @@ import { OpenAiService } from './course/openai.service';
 import { YoutubeService } from './course/youtube.service';
 import { PrismaService } from './course/prisma.service';
 import { LoggerModule } from 'nestjs-pino';
-import { colorizerFactory } from 'pino-pretty';
 
 @Module({
   imports: [
