@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { CourseOutput } from './course.service';
 import { ConfigService } from '@nestjs/config';
@@ -20,6 +20,7 @@ export class OpenAiService {
   private openai: OpenAI;
   private temperature: number = 1;
   private model: string = 'gpt-3.5-turbo';
+  private readonly logger = new Logger(OpenAiService.name);
 
   constructor(private readonly configService: ConfigService) {
     this.openai = new OpenAI({
@@ -55,8 +56,10 @@ export class OpenAiService {
       const generatedContent = response.choices[0].message?.content ?? '';
       return generatedContent ? JSON.parse(generatedContent) : null;
     } catch (error) {
-      console.error('Error generating course:', error);
-      throw error;
+      this.logger.log(
+        { error: error.message },
+        'Openai encountered a problem generating the course material.',
+      );
     }
   }
 
@@ -84,8 +87,10 @@ export class OpenAiService {
 
       return response.choices[0].message.content ?? 'No summary generated';
     } catch (error) {
-      console.error('Error summarizing transcript:', error);
-      return 'Error generating summary';
+      this.logger.log(
+        { error: error.message },
+        'Openai encountered a problem summarizing the video transcript.',
+      );
     }
   }
 
@@ -120,8 +125,10 @@ export class OpenAiService {
 
       return generatedQuestion ? JSON.parse(generatedQuestion) : emptyQuestion;
     } catch (error) {
-      console.error('Error generating questions:', error);
-      return emptyQuestion;
+      this.logger.log(
+        { error: error.message },
+        'Openai encountered a problem generating questions from the summary.',
+      );
     }
   }
 }
