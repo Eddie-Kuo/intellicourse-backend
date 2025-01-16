@@ -158,8 +158,10 @@ export class CourseService {
       },
       include: {
         units: {
+          orderBy: { unitNumber: 'asc' },
           include: {
             chapters: {
+              orderBy: { chapterNumber: 'asc' },
               include: {
                 questions: true,
               },
