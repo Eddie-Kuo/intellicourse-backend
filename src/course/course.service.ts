@@ -60,20 +60,27 @@ export class CourseService {
   }
 
   async processUnits(units: CourseOutput['units'], courseId: string) {
-    const unitPromises = units.map((unit) => this.processUnit(unit, courseId));
+    const unitPromises = units.map((unit, unitIndex) =>
+      this.processUnit(unit, courseId, unitIndex),
+    );
     await Promise.all(unitPromises);
   }
 
-  async processUnit(unit: CourseOutput['units'][0], courseId: string) {
+  async processUnit(
+    unit: CourseOutput['units'][0],
+    courseId: string,
+    unitIndex: number,
+  ) {
     const addedUnit = await this.prismaService.unit.create({
       data: {
         title: unit.title,
         courseId,
+        unitNumber: unitIndex + 1,
       },
     });
 
-    const chapterPromises = unit.chapters.map((chapter) =>
-      this.processChapter(chapter, addedUnit.id),
+    const chapterPromises = unit.chapters.map((chapter, chapterIndex) =>
+      this.processChapter(chapter, addedUnit.id, chapterIndex),
     );
     await Promise.all(chapterPromises);
   }
@@ -81,6 +88,7 @@ export class CourseService {
   async processChapter(
     chapter: CourseOutput['units'][0]['chapters'][0],
     unitId: string,
+    chapterIndex: number,
   ) {
     try {
       const videoId = await this.youtubeService.getYoutubeVideoId(
@@ -120,6 +128,7 @@ export class CourseService {
           videoId,
           youtubeSearchQuery: chapter.youtube_search_query,
           summary,
+          chapterNumber: chapterIndex + 1,
         },
       });
 
