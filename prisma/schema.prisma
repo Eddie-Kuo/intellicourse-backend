@@ -21,19 +21,20 @@ model Course {
 }
 
 model Unit {
-  id       String    @id @default(cuid())
-  title    String
-  courseId String
-  chapters Chapter[]
-  course   Course    @relation(fields: [courseId], references: [id])
+  id         String    @id @default(cuid())
+  title      String
+  courseId   String
+  chapters   Chapter[]
+  unitNumber Int
+  course     Course    @relation(fields: [courseId], references: [id])
 
   @@index([courseId], name: "courseId")
 }
 
 model Chapter {
-  id     String @id @default(cuid())
-  unitId String
-
+  id                 String @id @default(cuid())
+  unitId             String
+  chapterNumber      Int
   title              String
   videoId            String
   youtubeSearchQuery String
