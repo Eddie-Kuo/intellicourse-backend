@@ -51,9 +51,7 @@ export class CourseService {
       });
 
       await this.processUnits(generatedCourse.units, course.id);
-
-      // return the course Id to re route the user to the course once it finishes generating
-      return { message: 'Course generation completed' };
+      return { courseId: course.id };
     } catch (error) {
       this.logger.log({ error: error.message }, 'Error generating course.');
     }
