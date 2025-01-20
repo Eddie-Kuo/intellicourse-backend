@@ -6,6 +6,9 @@ import { OpenAiService } from './course/openai.service';
 import { YoutubeService } from './course/youtube.service';
 import { PrismaService } from './course/prisma.service';
 import { LoggerModule } from 'nestjs-pino';
+import { UserService } from './user/user.service';
+import { UserController } from './user/user.controller';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -36,8 +39,9 @@ import { LoggerModule } from 'nestjs-pino';
           },
         })
       : LoggerModule.forRoot(),
+    UserModule,
   ],
-  controllers: [],
-  providers: [CourseService, OpenAiService, YoutubeService, PrismaService],
+  controllers: [UserController],
+  providers: [CourseService, OpenAiService, YoutubeService, PrismaService, UserService],
 })
 export class AppModule {}
